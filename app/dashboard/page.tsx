@@ -1,3 +1,5 @@
+import HooksList from "@/components/HooksList";
+
 export default function Dashboard() {
-  return <h1>Hello world!</h1>;
+  return <HooksList />;
 }
