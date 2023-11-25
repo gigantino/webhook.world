@@ -12,7 +12,7 @@ export default async function DashboardLayout({
   return (
     <div className="flex flex-col gap-4">
       <Navbar />
-      <div className="w-full p-2 justify-center flex">
+      <div className="flex w-full justify-center p-2">
         <div className="w-full max-w-screen-lg">{children}</div>
       </div>
     </div>

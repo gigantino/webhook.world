@@ -1,5 +1,7 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,26 +10,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import { Button } from "./ui/button";
-import { signIn, signOut } from "next-auth/react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Github } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useSession } from "next-auth/react";
-import { Skeleton } from "./ui/skeleton";
+import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 
 export default function Navbar() {
   const { data: session, status } = useSession();
 
   return (
-    <nav className="w-full flex justify-center items-center p-2 border-b h-16">
-      <div className="flex justify-between w-full max-w-screen-lg items-center">
+    <nav className="flex h-16 w-full items-center justify-center border-b p-2  ">
+      <div className="flex w-full max-w-screen-lg items-center justify-between">
         <Link href="/" className="text-xl font-extrabold">
           🌎 webhook.world
         </Link>
         {status == "loading" ? (
-          <Skeleton className="w-[150px] h-[20px] rounded-full" />
+          <Skeleton className="h-[20px] w-[150px] rounded-full" />
         ) : (
           <div>
             {session && session.user ? (
@@ -45,6 +43,7 @@ export default function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuLabel>{session.user.email}</DropdownMenuLabel>
+                  <DropdownMenuLabel>{session.user.id}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <Link href="/dashboard">
                     <DropdownMenuItem>Dashboard</DropdownMenuItem>
