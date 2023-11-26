@@ -41,12 +41,9 @@ export async function POST(request: Request) {
   const postWebhookSchema = z.object({
     name: z
       .string()
-      .min(3, { message: "Name must be at least 3 characters long." })
-      .max(16, { message: "Name must be at most 16 characters long." })
-      .refine((value) => /^[a-zA-Z0-9_-]+$/.test(value), {
-        message:
-          "Invalid name format. It can only contain letters, numbers, underscores, and hyphens.",
-      }),
+      .min(3)
+      .max(16)
+      .refine((value) => /^[a-zA-Z0-9_-]+$/.test(value)),
   });
 
   const parsedBody = postWebhookSchema.safeParse(body);
