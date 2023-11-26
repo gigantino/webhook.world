@@ -1,35 +1,17 @@
-import extractGitHubUserId from "@/lib/extractGitHubUserId";
+import { getLoggedUser } from "@/lib/github";
 import { PrismaClient } from "@prisma/client";
-import { getServerSession } from "next-auth";
 import crypto from "node:crypto";
 import { z } from "zod";
 const prisma = new PrismaClient();
 
-export async function GET(request: Request) {
-  const session = await getServerSession();
-  if (!session || !session.user || typeof session.user.image !== "string") {
-    return Response.json(
-      {
-        error: "Unauthorized",
-      },
-      { status: 401 },
-    );
-  }
-
-  const userId = extractGitHubUserId(session.user.image);
-  if (!userId) {
-    return Response.json(
-      {
-        error: "Couldnt't extract GitHub userId",
-      },
-      { status: 500 },
-    );
-  }
+export async function GET() {
+  const loggedUser = await getLoggedUser();
+  if (!loggedUser.id) return loggedUser.error;
 
   const webhooks = await prisma.webhooks
     .findMany({
       where: {
-        author: userId,
+        author: loggedUser.id,
       },
     })
     .catch((err) => {
@@ -49,25 +31,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const session = await getServerSession();
-  if (!session || !session.user || typeof session.user.image !== "string") {
-    return Response.json(
-      {
-        error: "Unauthorized",
-      },
-      { status: 401 },
-    );
-  }
-
-  const userId = extractGitHubUserId(session.user.image);
-  if (!userId) {
-    return Response.json(
-      {
-        error: "Couldnt't extract GitHub userId",
-      },
-      { status: 500 },
-    );
-  }
+  const loggedUser = await getLoggedUser();
+  if (!loggedUser.id) return loggedUser.error;
 
   const body = await request.json().catch(() => {
     // This method fails if a body isn't returned
@@ -95,7 +60,7 @@ export async function POST(request: Request) {
           id,
           name: data.name,
           secret,
-          author: userId,
+          author: loggedUser.id,
         },
       })
       .catch((err) => {
