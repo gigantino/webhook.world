@@ -38,7 +38,7 @@ export default function Hook({ webhook }: HookProps) {
 
   return (
     !isDeleted && (
-      <div className="flex w-full items-center justify-between rounded-lg border px-3 py-2">
+      <div className="flex w-full flex-col items-center justify-between gap-2 rounded-lg border px-3 py-2 md:flex-row md:gap-0">
         <div className="flex flex-col">
           <Link
             className="font-bold hover:underline"
