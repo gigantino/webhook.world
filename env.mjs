@@ -10,7 +10,7 @@ export const env = createEnv({
     DATABASE_URL: z.string(),
   },
   client: {
-    NEXT_BASE_URL: z.string(),
+    NEXT_PUBLIC_BASE_URL: z.string(),
   },
   runtimeEnv: {
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
@@ -18,6 +18,6 @@ export const env = createEnv({
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,
-    NEXT_BASE_URL: process.env.NEXT_BASE_URL,
+    NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
   },
 });
