@@ -1,5 +1,6 @@
-import { Button } from "@/components/ui/button";
+"use client";
 
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,9 +12,51 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { env } from "@/env.mjs";
+import type { Webhooks as Webhook } from "@prisma/client";
 import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { z } from "zod";
 
 export default function NewHookDialog() {
+  const [name, setName] = useState("");
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  async function createNewHook() {
+    const nameSchema = z
+      .string()
+      .min(3, { message: "The name has to be at least 3 characters long." })
+      .max(16, { message: "The name has to be at max 16 characters long." })
+      .refine((value) => /^[a-zA-Z0-9_-]+$/.test(value), {
+        message:
+          "The only characters allowed are numbers, letters and underscores",
+      });
+
+    const parsedName = nameSchema.safeParse(name);
+    if (parsedName.success) {
+      const newHookReq = await fetch(
+        `${env.NEXT_PUBLIC_BASE_URL}/api/webhooks`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            name,
+          }),
+          credentials: "include",
+        },
+      );
+      if (!newHookReq.ok) {
+        // TODO: Handle the errors properly
+        setError("Internal server error!");
+      }
+      const data: Webhook = await newHookReq.json();
+      return router.push(`/dashboard/${data.id}`);
+    }
+
+    setError(JSON.parse(parsedName.error.message)[0].message);
+  }
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -28,15 +71,21 @@ export default function NewHookDialog() {
           <DialogDescription>Webhook setup wizard</DialogDescription>
         </DialogHeader>
         <div className="flex w-full flex-col gap-4 py-4">
-          <div>
-            <Label htmlFor="name" className="text-right">
+          <div className="flex flex-col gap-1">
+            <Label htmlFor="name" className="font-bold">
               Name
             </Label>
-            <Input id="name" className="col-span-3" />
+            <Input
+              id="name"
+              className="col-span-3"
+              value={name}
+              onChange={(v) => setName(v.target.value)}
+            />
+            {error && <div className="text-xs text-red-400">{error}</div>}
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit">Crate webhook</Button>
+          <Button onClick={createNewHook}>Crate webhook</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
