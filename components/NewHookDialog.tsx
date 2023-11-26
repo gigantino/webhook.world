@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { env } from "@/env.mjs";
 import type { Webhooks as Webhook } from "@prisma/client";
-import { Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { z } from "zod";
@@ -22,9 +22,12 @@ import { z } from "zod";
 export default function NewHookDialog() {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   async function createNewHook() {
+    if (isLoading) return;
+    setIsLoading(true);
     const nameSchema = z
       .string()
       .min(3, { message: "The name has to be at least 3 characters long." })
@@ -47,13 +50,16 @@ export default function NewHookDialog() {
         },
       );
       if (!newHookReq.ok) {
+        setIsLoading(false);
         // TODO: Handle the errors properly
         setError("Internal server error!");
       }
       const data: Webhook = await newHookReq.json();
+      setIsLoading(false);
       return router.push(`/dashboard/${data.id}`);
     }
 
+    setIsLoading(false);
     setError(JSON.parse(parsedName.error.message)[0].message);
   }
 
@@ -85,7 +91,15 @@ export default function NewHookDialog() {
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={createNewHook}>Crate webhook</Button>
+          <Button onClick={createNewHook} className="relative">
+            <Loader2
+              className={`absolute mr-2 h-4 w-4 animate-spin ${isLoading ? "text-white" : "text-transparent"
+                }`}
+            />
+            <span className={isLoading ? "text-transparent" : "text-white"}>
+              Crate webhook
+            </span>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
