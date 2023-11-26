@@ -55,7 +55,6 @@ export default function NewHookDialog() {
         setError("Internal server error!");
       }
       const data: Webhook = await newHookReq.json();
-      setIsLoading(false);
       return router.push(`/dashboard/${data.id}`);
     }
 
@@ -66,7 +65,7 @@ export default function NewHookDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>
+        <Button onClick={() => setIsLoading(false)}>
           <Plus className="mr-2 h-4 w-4" />
           New webhook
         </Button>

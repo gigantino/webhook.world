@@ -1,9 +1,10 @@
 "use client";
 import { env } from "@/env.mjs";
 import type { Webhooks as Webhook } from "@prisma/client";
-import { Trash } from "lucide-react";
+import { Check, Link as LinkIcon, Trash } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useCopyToClipboard } from "react-use";
 import { Button } from "./ui/button";
 
 interface HookProps {
@@ -12,6 +13,16 @@ interface HookProps {
 
 export default function Hook({ webhook }: HookProps) {
   const [isDeleted, setIsDeleted] = useState(false);
+  const [_state, copyToClipboard] = useCopyToClipboard();
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  useEffect(() => {
+    if (linkCopied) {
+      setTimeout(() => {
+        setLinkCopied(false);
+      }, 1000);
+    }
+  }, [linkCopied]);
 
   async function deleteHook() {
     setIsDeleted(true);
@@ -39,7 +50,22 @@ export default function Hook({ webhook }: HookProps) {
             {webhook.created_at.toString()}
           </span>
         </div>
-        <div>
+        <div className="flex gap-2">
+          <Button
+            variant={"outline"}
+            onClick={() => {
+              copyToClipboard(
+                `${env.NEXT_PUBLIC_BASE_URL}/webhook/${webhook.id}/${webhook.secret}`,
+              );
+              setLinkCopied(true);
+            }}
+          >
+            {linkCopied ? (
+              <Check className="h-4 w-4" />
+            ) : (
+              <LinkIcon className="h-4 w-4" />
+            )}
+          </Button>
           <Button variant={"destructive"} onClick={() => deleteHook()}>
             <Trash className="mr-2 h-4 w-4" />
             Delete
