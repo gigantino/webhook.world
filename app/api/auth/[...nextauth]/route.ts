@@ -9,14 +9,6 @@ const handler = NextAuth({
       clientSecret: env.GITHUB_CLIENT_SECRET,
     }),
   ],
-  callbacks: {
-    session: async ({ session, token }) => {
-      if (token.sub && typeof session.user === "object") {
-        session.user.id = token.sub;
-      }
-      return session;
-    },
-  },
 });
 
 export { handler as GET, handler as POST };

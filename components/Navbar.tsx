@@ -43,7 +43,6 @@ export default function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuLabel>{session.user.email}</DropdownMenuLabel>
-                  <DropdownMenuLabel>{session.user.id}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <Link href="/dashboard">
                     <DropdownMenuItem>Dashboard</DropdownMenuItem>
